@@ -1,0 +1,16 @@
+{
+  "category": "Metadata",
+  "changelog": "",
+  "description": "Download subtitles from the internet to use with your media files. (Requires configuration)",
+  "guid": "a0297691-cd9d-41f3-a13f-dcc62af96c33",
+  "name": "Feliratok.eu Subtitles",
+  "overview": "Download subtitles for your media",
+  "owner": "jellyfin",
+  "targetAbi": "10.9.0.0",
+  "timestamp": "2025-05-29T17:23:04.0000000Z",
+  "version": "1.0.0.0",
+  "status": "Active",
+  "autoUpdate": true,
+  "imagePath": "/var/lib/jellyfin/plugins/feliratok/jellyfin-plugin-feliratok_eu_subtitles.png",
+  "assemblies": []
+}
