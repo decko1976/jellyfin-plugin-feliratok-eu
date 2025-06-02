@@ -31,6 +31,12 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
         _logger = logger;
         _logger.LogInformation("Plugin name: {Name}, ID: {Id}", Name, Id);
         _logger.LogInformation("Plugin configuration path: {ApplicationPaths}", applicationPaths);
+        ConfigurationChanged += (_, _) =>
+        {
+            FeliratokEuDownloader.Instance?.ConfigurationChanged(Configuration);
+        };
+
+        FeliratokEuDownloader.Instance?.ConfigurationChanged(Configuration);
     }
 
     /// <inheritdoc />

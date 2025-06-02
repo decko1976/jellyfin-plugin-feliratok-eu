@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Jellyfin.Plugin.Feliratok.Eu.Configuration;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Controller.Subtitles;
 using MediaBrowser.Model.Providers;
@@ -17,6 +18,7 @@ public class FeliratokEuDownloader : ISubtitleProvider
 {
     private readonly ILogger<FeliratokEuDownloader> _logger;
     private readonly SubtitleFetcher _subtitleFetcher;
+    private PluginConfiguration? _configuration;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FeliratokEuDownloader"/> class.
@@ -52,7 +54,11 @@ public class FeliratokEuDownloader : ISubtitleProvider
     public Task<IEnumerable<RemoteSubtitleInfo>> Search(SubtitleSearchRequest request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Search called with request: {@Request}", request);
-        return _subtitleFetcher.GetSubtitlesAsync(request.Name, request.TwoLetterISOLanguageName.Substring(0, 2), request.Language);
+        return _subtitleFetcher.GetSubtitlesAsync(
+        request.Name,
+        request.TwoLetterISOLanguageName.Substring(0, 2),
+        request.Language,
+        _configuration?.ExactMatch ?? true);
     }
 
     private async Task<SubtitleResponse> GetSubtitlesInternal(string id, CancellationToken cancellationToken)
@@ -67,9 +73,18 @@ public class FeliratokEuDownloader : ISubtitleProvider
             Format = "srt",
             // Stream = new MemoryStream(Encoding.Latin1.GetBytes(subtitleContent)),
             // Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            Stream = new MemoryStream(Encoding.Convert(Encoding.GetEncoding("iso-8859-2"), Encoding.UTF8, subtitleContent)),
+            Stream = new MemoryStream(Encoding.Convert(
+                Encoding.GetEncoding(PluginConfiguration.GetCodePageName(_configuration?.SelectedSourceEncoding ?? SourceEncoding.UTF8)),
+                Encoding.UTF8,
+                subtitleContent)),
             Language = idParts[1],
         };
         return response;
+    }
+
+    internal void ConfigurationChanged(PluginConfiguration e)
+    {
+        _configuration = e;
+        _logger.LogInformation("Configuration changed: {@Configuration}", e);
     }
 }

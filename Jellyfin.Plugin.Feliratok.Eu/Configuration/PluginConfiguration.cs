@@ -9,17 +9,22 @@ namespace Jellyfin.Plugin.Feliratok.Eu.Configuration;
 /// <summary>
 /// The configuration options.
 /// </summary>
-public enum SomeOptions
+public enum SourceEncoding
 {
     /// <summary>
-    /// Option one.
+    /// Latin1.
     /// </summary>
-    OneOption,
+    Latin1,
 
     /// <summary>
-    /// Second option.
+    /// Latin2.
     /// </summary>
-    AnotherOption
+    Latin2,
+
+    /// <summary>
+    /// UTF-8 option.
+    /// </summary>
+    UTF8
 }
 
 /// <summary>
@@ -33,29 +38,33 @@ public class PluginConfiguration : BasePluginConfiguration
     public PluginConfiguration()
     {
         // set default options here
-        Options = SomeOptions.AnotherOption;
-        TrueFalseSetting = true;
-        AnInteger = 2;
-        AString = "string";
+        SelectedSourceEncoding = SourceEncoding.Latin2;
+        ExactMatch = true;
     }
 
     /// <summary>
     /// Gets or sets a value indicating whether some true or false setting is enabled..
     /// </summary>
-    public bool TrueFalseSetting { get; set; }
-
-    /// <summary>
-    /// Gets or sets an integer setting.
-    /// </summary>
-    public int AnInteger { get; set; }
-
-    /// <summary>
-    /// Gets or sets a string setting.
-    /// </summary>
-    public string AString { get; set; }
+    public bool ExactMatch { get; set; }
 
     /// <summary>
     /// Gets or sets an enum option.
     /// </summary>
-    public SomeOptions Options { get; set; }
+    public SourceEncoding SelectedSourceEncoding { get; set; }
+
+    /// <summary>
+    /// Gets the code page name corresponding to the specified <see cref="SourceEncoding"/>.
+    /// </summary>
+    /// <param name="encoding">The source encoding.</param>
+    /// <returns>The code page name as a string.</returns>
+    public static string GetCodePageName(SourceEncoding encoding)
+    {
+        return encoding switch
+        {
+            SourceEncoding.Latin1 => "iso-8859-1",
+            SourceEncoding.Latin2 => "iso-8859-2",
+            SourceEncoding.UTF8 => "utf-8",
+            _ => "utf-8"
+        };
+    }
 }

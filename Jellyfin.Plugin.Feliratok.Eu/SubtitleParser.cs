@@ -29,8 +29,9 @@ public class SubtitleParser
     /// <param name="htmlContent">The HTML content to parse.</param>
     /// <param name="searchTitle">The title to search for in the subtitles.</param>
     /// <param name="threeLetterISOLanguageNameCode">The three-letter ISO language name code (e.g., "hun" for Hungarian).</param>
+    /// <param name="exactMatch">Whether to require an exact match for the title.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public Task<IEnumerable<RemoteSubtitleInfo>> ParseResponse(string htmlContent, string searchTitle, string threeLetterISOLanguageNameCode)
+    public Task<IEnumerable<RemoteSubtitleInfo>> ParseResponse(string htmlContent, string searchTitle, string threeLetterISOLanguageNameCode, bool exactMatch)
     {
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlContent);
@@ -90,12 +91,10 @@ public class SubtitleParser
                 _logger.LogInformation("Date: {Date}", date);
                 _logger.LogInformation("DetailedInfoId: {DetailedInfoId}", detailedInfoId);
 
-                if (!string.IsNullOrEmpty(title) && title.Replace("(SubRip)", string.Empty, StringComparison.OrdinalIgnoreCase).Trim().Equals(searchTitle, StringComparison.OrdinalIgnoreCase))
+                if (!exactMatch || (!string.IsNullOrEmpty(title) && title.Replace("(SubRip)", string.Empty, StringComparison.OrdinalIgnoreCase).Trim().Equals(searchTitle, StringComparison.OrdinalIgnoreCase)))
                 {
                     titleInfoList.Add(new RemoteSubtitleInfo
                     {
-                        // Id = $"srt-{request.Language}-{i.Attributes?.Files[0].FileId}{((i.Attributes?.HearingImpaired ?? false) ? "-sdh" : string.Empty)}{((i.Attributes?.ForeignPartsOnly ?? false) ? "-forced" : string.Empty)}",
-
                         Id = $"srt-{threeLetterISOLanguageNameCode}-{downloadId}",
                         Name = title,
                         ProviderName = "FeliratokEu",

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Jellyfin.Plugin.Feliratok.Eu.Configuration;
 using MediaBrowser.Model.Providers;
 using Microsoft.Extensions.Logging;
 
@@ -64,8 +65,9 @@ public class SubtitleFetcher
     /// <param name="name">The name of the movie or show to search for subtitles.</param>
     /// <param name="languageCode">The ISO language code (e.g., "hu", "en").</param>
     /// <param name="threeLetterISOLanguageNameCode">The three-letter ISO language name code (e.g., "hun" for Hungarian).</param>
+    /// <param name="exactMatch">Whether to require an exact match for the subtitle search.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the subtitle content as a string.</returns>
-    public async Task<IEnumerable<RemoteSubtitleInfo>> GetSubtitlesAsync(string name, string languageCode, string threeLetterISOLanguageNameCode = "hun")
+    public async Task<IEnumerable<RemoteSubtitleInfo>> GetSubtitlesAsync(string name, string languageCode, string threeLetterISOLanguageNameCode, bool exactMatch)
     {
         if (!LanguageMap.TryGetValue(languageCode, out var languageName))
         {
@@ -78,7 +80,7 @@ public class SubtitleFetcher
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            return await _subtitleParser.ParseResponse(content, name, threeLetterISOLanguageNameCode).ConfigureAwait(false);
+            return await _subtitleParser.ParseResponse(content, name, threeLetterISOLanguageNameCode, exactMatch).ConfigureAwait(false);
         }
         else
         {
